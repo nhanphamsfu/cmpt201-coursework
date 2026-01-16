@@ -19,7 +19,6 @@ int main(void) {
     ssize_t num_char = getline(&buff, &size, stdin);
     if (num_char < 0) {
       perror("getline failed");
-      free(buff);
       return EXIT_FAILURE;
     }
     if (num_char == 1 && buff[0] == '\n') {
@@ -31,7 +30,6 @@ int main(void) {
     }
     print_tokens(buff, num_char);
   }
-
   free(buff);
   return 0;
 }
