@@ -1,38 +1,30 @@
 #define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
 int main(void) {
-  char *buf = NULL;
-  size_t size = 0;
-
+  char *line = NULL;
+  size_t cap = 0;
   while (1) {
     printf("Enter programs to run.\n> ");
     fflush(stdout);
-
-    ssize_t len = getline(&buf, &size, stdin);
-    if (len < 0)
+    ssize_t n = getline(&line, &cap, stdin);
+    if (n < 0) {
       break;
-
-    char *save = NULL;
-    char *path = strtok_r(buf, " \t\r\n", &save);
-    if (path == NULL)
-      continue;
-
+    }
+    if (n > 0 && line[n - 1] == '\n') {
+      line[n - 1] = '\0';
+    }
     pid_t pid = fork();
-
     if (pid == 0) {
-      execl(path, path, (char *)NULL);
+      execl(line, line, (char *)NULL);
       printf("Exec failure\n");
       _exit(1);
     }
-
     waitpid(pid, NULL, 0);
   }
-
-  free(buf);
+  free(line);
   return 0;
 }
